@@ -3,7 +3,7 @@
  */
 
 #include <stdio.h>
-#include <soxr.h>
+#include <audsrc.h>
 #include <audeering/wavelib-audeering.h>
 #include "sr-converter.h"
 
@@ -24,36 +24,32 @@ int main(int argc, char **argv)
   double orate = atof(argv[2]);
 
   t_wave_obj *waveObj = init_wave(in_file);
-  unsigned long inputLength = waveObj->nSamples;
+  unsigned long inLen = waveObj->nSamples;
   double irate = (double) waveObj->header.sampleRate;
-  float *in = (float*) malloc(inputLength * sizeof(float));
-  read_wave(waveObj, in, 1, inputLength, 1);
+  float *in = (float*) malloc(inLen * sizeof(float));
+  read_wave(waveObj, in, 1, inLen, 1);
   free_wave(waveObj);
 
-  size_t olen = (size_t)(inputLength * orate / irate + .5);   /* Array output len. */
-  float * out = malloc(sizeof(*out) * olen);       /* Allocate output buffer. */
-  size_t odone;
+  size_t outLen = (size_t)(inLen * orate / irate + .5);   /* Array output len. */
+  float * out = malloc(sizeof(*out) * outLen);       /* Allocate output buffer. */
 
-  soxr_error_t error = soxr_oneshot(irate, orate, 1, /* Rates and # of chans. */
-      in, inputLength, NULL,                         /* Input. */
-      out, olen, &odone,                             /* Output. */
-      NULL, NULL, NULL);                             /* Default configuration.*/
-  printf("%-26s %s\n", argv[0], soxr_strerror(error));
+  t_audsrc_config *audsrcConfig = init_audsrc_config(irate, orate);
+  audsrc_oneshot(audsrcConfig, in, inLen, out, outLen);
 
   // Convert to integer PCM samples
-  short signed int *out_uint16 = malloc(sizeof(short signed int) * olen);
-  for (int i = 0; i < olen; ++i){
+  short signed int *out_uint16 = malloc(sizeof(short signed int) * outLen);
+  for (int i = 0; i < outLen; ++i){
     out_uint16[i] = (short signed int) (FSR/2) * clipSample(out[i]);
   }
 
   // Pipe the audio data to ffmpeg, which writes it to a wav file
   FILE *pipeout;
   pipeout = popen("ffmpeg -y -f s16le -ar 16000 -ac 1 -i - output.wav", "w");
-  fwrite(out_uint16, 2, olen, pipeout);
+  fwrite(out_uint16, 2, outLen, pipeout);
   pclose(pipeout);
 
   free(in);
   free(out);
   free(out_uint16);
-  return !!error;
+  return 0;
 }

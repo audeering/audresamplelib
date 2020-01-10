@@ -35,8 +35,5 @@
 #undef max
 #define max(x,y) ((x)>(y)?(x):(y))
 
-#undef AL
-#define AL(a) (sizeof(a)/sizeof((a)[0]))  /* Array Length */
-
 #undef M_PI /* Sometimes missing, so ensure that it is defined: */
 #define M_PI 3.14159265358979323846
