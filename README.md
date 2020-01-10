@@ -1,14 +1,14 @@
-# sr-converter-example
+# audsrclib
 
-Example C project for a sample rate conversion tool based on `soxr` 
-(https://sourceforge.net/projects/soxr/).
+A C wrapper around `soxr` (https://sourceforge.net/projects/soxr/).
 
 
 ## Build
 First, download, build and install `soxr` (https://sourceforge.net/p/soxr/code/ci/master/tree/).
 
 In addition, clone and build the `audeering-libs` as a static library (see 
-https://gitlab.audeering.com/tools/audeering-libs). 
+https://gitlab.audeering.com/tools/audeering-libs). The `audeering-libs` are 
+used here just for reading a wav file in the sample tool.  
 
 Then,
 ```
@@ -20,8 +20,10 @@ cmake .. \
     -DINCLUDE_DIRECTORIES="/path/to/audeering-libs/include;/usr/local/include"
 make
 ```
+This will build both the wrapper library around `soxr` and a sample executable 
+that performs resampling.
 
-## Usage
+## Usage of the sample executable
 ```
 ./sr-converter path/to/input/wav targetSR
 ```
