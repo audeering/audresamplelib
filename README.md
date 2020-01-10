@@ -1,10 +1,14 @@
 # sr-converter-example
 
-Example C project for a sample rate conversion tool based on `soxr` (https://sourceforge.net/projects/soxr/).
+Example C project for a sample rate conversion tool based on `soxr` 
+(https://sourceforge.net/projects/soxr/).
 
 
 ## Build
-First download, build, and install `soxr` (https://sourceforge.net/p/soxr/code/ci/master/tree/).
+First, download, build and install `soxr` (https://sourceforge.net/p/soxr/code/ci/master/tree/).
+
+In addition, clone and build the `audeering-libs` as a static library (see 
+https://gitlab.audeering.com/tools/audeering-libs). 
 
 Then,
 ```
