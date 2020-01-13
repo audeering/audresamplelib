@@ -1,4 +1,4 @@
-# audsrclib
+# audresamplelib
 
 A C wrapper around `soxr` (https://sourceforge.net/projects/soxr/).
 
