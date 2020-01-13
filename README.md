@@ -11,7 +11,7 @@ See https://gitlab.audeering.com/tools/audeering-libs (specifically, the section
 entitled "Building and installing to a custom path").
 
 Then,
-```
+```bash
 mkdir Release
 cd Release
 cmake \
