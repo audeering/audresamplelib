@@ -32,8 +32,9 @@ int main(int argc, char **argv)
   float * out = malloc(outLen * sizeof(float));
 
   // Configure and perform the conversion
-  t_audsrc_config *audsrcConfig = init_audsrc_config(srIn, srOut);
-  audsrc_oneshot(audsrcConfig, in, inLen, out, outLen);
+  t_converter_config *converterConfig = init_converter_config(srIn, srOut);
+  audresample_oneshot(converterConfig, in, inLen, out, outLen);
+  free_converter_config(converterConfig);
 
   // Convert to integer PCM samples
   short signed int *out_int16 = malloc(sizeof(short signed int) * outLen);

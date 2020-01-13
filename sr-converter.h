@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <audsrc.h>
+#include <audresample.h>
 #include <audeering/wavelib-audeering.h>
 
 #undef M_PI /* Sometimes missing, so ensure that it is defined: */
