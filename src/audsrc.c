@@ -8,6 +8,12 @@ t_audsrc_config * init_audsrc_config(double srIn, double srOut)
   return config;
 }
 
+size_t get_output_length(size_t inLen, double srIn, double srOut)
+{
+  size_t outLen = (size_t) (inLen * srOut / srIn + 0.5);
+  return outLen;
+}
+
 void audsrc_oneshot(
     t_audsrc_config *audsrcConfig,
     FLOAT_TYPE *in, size_t inLen,
