@@ -14,8 +14,10 @@ void free_converter_config(t_converter_config *converterConfig)
   free(converterConfig);
 }
 
-size_t get_output_length(size_t inLen, double srIn, double srOut)
+size_t get_output_length(size_t inLen, t_converter_config *converterConfig)
 {
+  double srIn = converterConfig->srIn;
+  double srOut = converterConfig->srOut;
   size_t outLen = (size_t) (inLen * srOut / srIn + 0.5);
   return outLen;
 }

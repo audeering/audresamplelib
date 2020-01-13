@@ -28,11 +28,10 @@ int main(int argc, char **argv)
   read_wave(waveObj, in, 1, inLen, 1);
   free_wave(waveObj);
 
-  size_t outLen = get_output_length(inLen, srIn, srOut);
-  float * out = malloc(outLen * sizeof(float));
-
   // Configure and perform the conversion
   t_converter_config *converterConfig = init_converter_config(srIn, srOut);
+  size_t outLen = get_output_length(inLen, converterConfig);
+  float * out = malloc(outLen * sizeof(float));
   audresample_oneshot(converterConfig, in, inLen, out, outLen);
   free_converter_config(converterConfig);
 

@@ -10,7 +10,7 @@ t_converter_config * init_converter_config(double srIn, double srOut);
 
 void free_converter_config(t_converter_config *converterConfig);
 
-size_t get_output_length(size_t inLen, double srIn, double srOut);
+size_t get_output_length(size_t inLen, t_converter_config *converterConfig);
 
 void audresample_oneshot(
     t_converter_config *converterConfig,
