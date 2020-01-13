@@ -17,7 +17,7 @@ mkdir Release
 cd Release
 cmake \
     -DAUDEERING_LIBS_PATH=</path/to/audeering-libs> \
-    -Daudeering_DIR=</path/to/audeering-libs/installation>/lib/cmake/audeering \
+    -Daudeering_DIR=</path/to/audeering-libs/installation/root>/lib/cmake/audeering \
     .. \
     -DCMAKE_BUILD_TYPE=Release
 make
