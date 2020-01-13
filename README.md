@@ -25,5 +25,5 @@ that performs resampling.
 
 ## Usage of the sample executable
 ```
-./sr-converter path/to/input/wav targetSR
+./sr-converter <path/to/input/wav> <target-sr>
 ```
