@@ -8,7 +8,8 @@ First, download, build and install `soxr` (https://sourceforge.net/p/soxr/code/c
 
 In addition, clone, build and install the `audeering-libs` as a static library.
 See https://gitlab.audeering.com/tools/audeering-libs (specifically, the section
-entitled "Building and installing to a custom path").
+entitled "Building and installing to a custom path": 
+https://gitlab.audeering.com/tools/audeering-libs#building-and-installing-to-a-custom-path).
 
 Then,
 ```bash
