@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(AUDRESAMPLE)
 
 option(BUILD_SHARED_LIB "Build libaudresample as a shared object." OFF)
+set(AUDEERING_LIBS_PATH "" CACHE PATH "Path to the audeering libs source folder.")
 
 # set C standard to version 99 for all targets
 set(CMAKE_C_STANDARD 99)
@@ -10,11 +11,6 @@ set(CMAKE_C_STANDARD 99)
 # List of source files: libaudresample_SOURCES
 set(libaudresample_SOURCES
     src/audresample.c
-)
-
-include_directories(
-	${INCLUDE_DIRECTORIES},
-	"${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 if(BUILD_SHARED_LIB)
@@ -27,17 +23,22 @@ endif()
 set_property(TARGET audresample PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(audresample
-    PUBLIC 
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
+	PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/include"
+		"${AUDEERING_LIBS_PATH}/include"
 )
 
 add_executable(sr-converter sr-converter.c)
+target_include_directories(sr-converter 
+	PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/include"
+		"${AUDEERING_LIBS_PATH}/include"
+)
 
-find_library(audeering audeering ${CMAKE_LIBRARY_PATH})
+find_package(audeering REQUIRED)
 target_link_libraries(sr-converter PRIVATE audeering)
 
 target_link_libraries(sr-converter PRIVATE audresample)
 
-find_library(soxr soxr ${CMAKE_LIBRARY_PATH})
+find_library(soxr soxr)
 target_link_libraries(sr-converter PRIVATE soxr)
