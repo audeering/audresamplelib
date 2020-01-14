@@ -22,15 +22,27 @@ size_t get_output_length(size_t inLen, t_converter_config *converterConfig)
   return outLen;
 }
 
+soxr_io_spec_t to_sox_type(size_t dataSize)
+{
+  if (dataSize == sizeof(float)) {
+    return soxr_io_spec(SOXR_FLOAT32, SOXR_FLOAT32);
+  } else if (dataSize == sizeof(double)) {
+    return soxr_io_spec(SOXR_FLOAT64, SOXR_FLOAT64);
+  } else {
+    exit(EXIT_FAILURE);
+  }
+}
+
 void audresample_oneshot(
     t_converter_config *converterConfig,
     FLOAT_TYPE *in, size_t inLen,
     FLOAT_TYPE *out, size_t outLen)
 {
   size_t odone;
+  soxr_io_spec_t ioSpec = to_sox_type(sizeof(FLOAT_TYPE));
   soxr_error_t error = soxr_oneshot(
       converterConfig->srIn, converterConfig->srOut, 1,  // Rates and # of chans
       in, inLen, NULL,                                   // Input
       out, outLen, &odone,                               // Output
-      NULL, NULL, NULL);                                 // Default config
+      &ioSpec, NULL, NULL);                              // Configuration
 }
