@@ -28,6 +28,9 @@ target_include_directories(audresample
 		"${AUDEERING_LIBS_PATH}/include"
 )
 
+find_library(soxr soxr)
+target_link_libraries(audresample PRIVATE soxr)
+
 add_executable(sr-converter sr-converter.c)
 target_include_directories(sr-converter 
 	PRIVATE
@@ -37,8 +40,4 @@ target_include_directories(sr-converter
 
 find_package(audeering REQUIRED)
 target_link_libraries(sr-converter PRIVATE audeering)
-
 target_link_libraries(sr-converter PRIVATE audresample)
-
-find_library(soxr soxr)
-target_link_libraries(sr-converter PRIVATE soxr)
