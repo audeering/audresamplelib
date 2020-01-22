@@ -29,7 +29,7 @@ int main(int argc, char **argv)
   free_wave(waveObj);
 
   // Configure and perform the conversion
-  t_converter_config converterConfig = init_converter_config(srIn, srOut);
+  t_converter_config converterConfig = init_converter_config(srIn, srOut, 'h');
   size_t outLen = get_output_length(inLen, converterConfig);
   float * out = malloc(outLen * sizeof(float));
   audresample_oneshot(converterConfig, in, inLen, out, outLen);

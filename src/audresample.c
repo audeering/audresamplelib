@@ -1,10 +1,35 @@
 #include <audresample.h>
 
-t_converter_config init_converter_config(double srIn, double srOut)
+t_converter_config init_converter_config(
+    double srIn, double srOut, char quality)
 {
+  unsigned long qualityRecipe;
+  switch (quality) {
+    case 'q':
+      qualityRecipe = SOXR_QQ;
+      break;
+    case 'l':
+      qualityRecipe = SOXR_LQ;
+      break;
+    case 'm':
+      qualityRecipe = SOXR_MQ;
+      break;
+    case 'h':
+      qualityRecipe = SOXR_HQ;
+      break;
+    case 'v':
+      qualityRecipe = SOXR_VHQ;
+      break;
+    default:
+      qualityRecipe = SOXR_HQ;
+  }
+  // TODO: set the flags as well...
+  soxr_quality_spec_t qualitySpec = soxr_quality_spec(qualityRecipe, 0);
+
   t_converter_config config;
   config.srIn = srIn;
   config.srOut = srOut;
+  config.quality = qualitySpec;
   return config;
 }
 
@@ -38,5 +63,5 @@ void audresample_oneshot(
       converterConfig.srIn, converterConfig.srOut, 1,  // Rates and # of chans
       in, inLen, NULL,                                 // Input
       out, outLen, &odone,                             // Output
-      &ioSpec, NULL, NULL);                            // Configuration
+      &ioSpec, &converterConfig.quality, NULL);        // Configuration
 }

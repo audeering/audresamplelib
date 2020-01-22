@@ -5,9 +5,12 @@
 typedef struct {
   double srIn;
   double srOut;
+  soxr_quality_spec_t quality;
 } t_converter_config;
 
-t_converter_config init_converter_config(double srIn, double srOut);
+t_converter_config init_converter_config(
+    double srIn, double srOut, char quality
+);
 
 size_t get_output_length(size_t inLen, t_converter_config converterConfig);
 
