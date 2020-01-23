@@ -5,14 +5,21 @@
 typedef struct {
   double srIn;
   double srOut;
-  soxr_quality_spec_t quality;
+  char quality;
 } t_converter_config;
 
+/** The \p quality character is directly mapped to one of the 5 standard quality
+ * recipes provided by soxr:
+ * * q: quick
+ * * l: low
+ * * m: medium
+ * * h: high
+ * * v: very high */
+soxr_quality_spec_t get_soxr_quality(char quality);
 
 /** Configure the converter.
  *
- * The \p quality parameter is directly mapped to one of the 5 standard quality
- * recipes provided by soxr:
+ * Available characters for the \p quality argument:
  * * q: quick
  * * l: low
  * * m: medium
