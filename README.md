@@ -1,10 +1,10 @@
 # audresamplelib
 
-A C wrapper around `soxr` (https://sourceforge.net/projects/soxr/).
+A C wrapper around [soxr](https://sourceforge.net/projects/soxr/).
 
 
 ## Build
-First, download, build and install `soxr` (https://sourceforge.net/p/soxr/code/ci/master/tree/).
+First, download, build and install `soxr` ([code](https://sourceforge.net/p/soxr/code/ci/master/tree/)).
 
 In addition, clone, build and install the `audeering-libs` as a static library.
 See [audering-libs](https://gitlab.audeering.com/tools/audeering-libs) (specifically, the section [Building and installing to a custom path](https://gitlab.audeering.com/tools/audeering-libs#building-and-installing-to-a-custom-path)).
