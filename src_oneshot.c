@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   const int strBufferLen = 1024;
   char outFile[strBufferLen];
   int outFileLen = snprintf(outFile, strBufferLen,
-                            "%s_%s.wav", argv[1], argv[2]);
+                            "%s_sr%sHz.wav", argv[1], argv[2]);
   if (outFileLen > strBufferLen) {
     printf("Input file name is too long!\n");
     return 1;
