@@ -31,8 +31,9 @@ acts in a streaming fashion (`src_streaming`).
 ## Usage examples
 The two sample executables (`src_oneshot` and `src_streaming`) are not really 
 meant for extensive use (even though they can be effectively used for SRC of wav
-files), but their source code (`src_oneshot.c` and `src_streaming.c`) is rather 
-meant to serve as usage examples for the library's API. 
+files), but their source code ([`src_oneshot.c`](src_oneshot.c) and 
+[`src_streaming.c`](src_streaming.c)) is rather meant to serve as usage examples 
+for the library's API. 
 
 ### Command line usage of the conversion tools
 ```
