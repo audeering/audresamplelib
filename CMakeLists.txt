@@ -31,13 +31,29 @@ target_include_directories(audresample
 find_library(soxr soxr)
 target_link_libraries(audresample PRIVATE soxr)
 
-add_executable(sr-converter sr-converter.c)
-target_include_directories(sr-converter 
+
+###### executable (oneshot) ######
+
+add_executable(src_oneshot src_oneshot.c)
+target_include_directories(src_oneshot 
 	PRIVATE
 		"${CMAKE_CURRENT_SOURCE_DIR}/include"
 		"${AUDEERING_LIBS_PATH}/include"
 )
 
 find_package(audeering REQUIRED)
-target_link_libraries(sr-converter PRIVATE audeering)
-target_link_libraries(sr-converter PRIVATE audresample)
+target_link_libraries(src_oneshot PRIVATE audeering)
+target_link_libraries(src_oneshot PRIVATE audresample)
+
+
+###### executable (streaming) ######
+
+add_executable(src_streaming src_streaming.c)
+
+target_include_directories(src_streaming
+	PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/include"
+		"${AUDEERING_LIBS_PATH}/include"
+)
+target_link_libraries(src_streaming PRIVATE audeering)
+target_link_libraries(src_streaming PRIVATE audresample)

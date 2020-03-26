@@ -45,6 +45,15 @@ size_t get_output_length(size_t inLen, t_converter_config converterConfig)
   return outLen;
 }
 
+size_t get_output_length_from_buffer_length(
+    size_t bufferLen, t_converter_config converterConfig)
+{
+  double srIn = converterConfig.srIn;
+  double srOut = converterConfig.srOut;
+  size_t outLen = (size_t) (srOut * bufferLen / (srIn + srOut) + .5);
+  return outLen;
+}
+
 soxr_io_spec_t to_sox_type(size_t dataSize)
 {
   if (dataSize == sizeof(float)) {
@@ -56,17 +65,57 @@ soxr_io_spec_t to_sox_type(size_t dataSize)
   }
 }
 
-void audresample_oneshot(
+soxr_error_t audresample_oneshot(
     t_converter_config converterConfig,
-    FLOAT_TYPE *in, size_t inLen,
+    const FLOAT_TYPE *in, size_t inLen,
     FLOAT_TYPE *out, size_t outLen)
 {
+  soxr_error_t err = 0;
   size_t odone;
   soxr_io_spec_t ioSpec = to_sox_type(sizeof(FLOAT_TYPE));
   soxr_quality_spec_t qualitySpec = get_soxr_quality(converterConfig.quality);
-  soxr_error_t error = soxr_oneshot(
-      converterConfig.srIn, converterConfig.srOut, 1,  // Rates and # of chans
-      in, inLen, NULL,                                 // Input
-      out, outLen, &odone,                             // Output
-      &ioSpec, &qualitySpec, NULL);                    // Configuration
+  if (converterConfig.srIn != converterConfig.srOut) {
+    err = soxr_oneshot(
+        converterConfig.srIn, converterConfig.srOut, 1,  // Rates and # of chans
+        in, inLen, NULL,                                 // Input
+        out, outLen, &odone,                             // Output
+        &ioSpec, &qualitySpec, NULL);                    // Configuration
+  } else {
+    memcpy(out, in, outLen * sizeof(FLOAT_TYPE));
+  }
+  return err;
+}
+
+soxr_t audresample_create(
+    t_converter_config converterConfig, soxr_error_t *error)
+{
+  soxr_io_spec_t ioSpec = to_sox_type(sizeof(FLOAT_TYPE));
+  soxr_quality_spec_t qualitySpec = get_soxr_quality(converterConfig.quality);
+  soxr_t resampler = soxr_create(
+      converterConfig.srIn,      /* Input sample-rate. */
+      converterConfig.srOut,     /* Output sample-rate. */
+      1,                         /* Number of channels to be used. */
+      error,                     /* To report any error during creation. */
+      &ioSpec,                   /* To specify non-default I/O formats. */
+      &qualitySpec,              /* To specify non-default resampling quality.*/
+      NULL);                     /* To specify non-default runtime resources.*/
+  return resampler;
+}
+
+void audresample_delete(soxr_t resampler)
+{
+  soxr_delete(resampler);
+}
+
+soxr_error_t audresample_process(
+    soxr_t resampler,
+    const soxr_in_t in, size_t ilen, size_t *idone,
+    soxr_out_t  out, size_t olen, size_t *odone)
+{
+  soxr_error_t err = soxr_process(
+      resampler,
+      in, ilen, idone,
+      out, olen, odone
+  );
+  return err;
 }

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <errno.h>
+#include <math.h>
 #include <audresample.h>
 #include <audeering/wavelib-audeering.h>
 

@@ -20,10 +20,13 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release
 make
 ```
-This will build both the wrapper library around `soxr` and a sample executable 
-that performs resampling.
+This will build both the wrapper library around `soxr` and two sample tools 
+(executables) for sample rate conversion, one based on the 
+`audresample_oneshot()` function (`src_oneshot`), the other based on the `audresample_process()` function, which acts in a streaming fashion 
+(`src_streaming`).
 
-## Usage of the sample executable
+## Usage of the sample src tools
 ```
-./sr-converter <path/to/input/wav> <target-sr>
+./src_oneshot <path/to/input/wav> <target-sr>
+./src_streaming <path/to/input/wav> <target-sr>
 ```
