@@ -4,16 +4,7 @@
 
 #include "src.h"
 
-#define FSR 65536.0
 #define buf_total_len 512  /* In samples. */
-
-
-FLOAT_TYPE clipSample(FLOAT_TYPE value);
-
-size_t read_block(
-    FLOAT_TYPE *readPointer, FLOAT_TYPE *wholeSignal, size_t start,
-    size_t blockSize
-);
 
 
 int main(int argc, char **argv)
@@ -142,13 +133,4 @@ int main(int argc, char **argv)
   free(output_pcm);
 
   return 0;
-}
-
-
-FLOAT_TYPE clipSample(FLOAT_TYPE value)
-{
-  if (abs(value) > 1.0f) {
-    value = value > 0.0 ? 1.0 : -1.0;
-  }
-  return value;
 }

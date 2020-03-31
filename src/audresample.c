@@ -110,7 +110,7 @@ void audresample_delete(soxr_t resampler)
 soxr_error_t audresample_process(
     soxr_t resampler,
     const soxr_in_t in, size_t ilen, size_t *idone,
-    soxr_out_t  out, size_t olen, size_t *odone)
+    soxr_out_t out, size_t olen, size_t *odone)
 {
   soxr_error_t err = soxr_process(
       resampler,
