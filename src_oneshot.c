@@ -5,16 +5,6 @@
 
 #include "src.h"
 
-#define FSR 65536.0
-
-float clipSample(float value)
-{
-  if (abs(value) > 1.0f) {
-    value = value > 0.0 ? 1.0 : -1.0;
-  }
-  return value;
-}
-
 
 int main(int argc, char **argv)
 {
@@ -35,7 +25,7 @@ int main(int argc, char **argv)
   t_wave_obj *waveObj = init_wave(inFile);
   unsigned long inLen = waveObj->nSamples;
   double srIn = (double) waveObj->header.sampleRate;
-  float *in = (float*) malloc(inLen * sizeof(float));
+  FLOAT_TYPE *in = (FLOAT_TYPE*) malloc(inLen * sizeof(FLOAT_TYPE));
   read_wave(waveObj, in, 1, inLen, 1);
   free_wave(waveObj);
 
@@ -43,7 +33,7 @@ int main(int argc, char **argv)
   soxr_error_t err;
   t_converter_config converterConfig = init_converter_config(srIn, srOut, 'h');
   size_t outLen = get_output_length(inLen, converterConfig);
-  float *out = malloc(outLen * sizeof(float));
+  FLOAT_TYPE *out = malloc(outLen * sizeof(FLOAT_TYPE));
   err = audresample_oneshot(converterConfig, in, inLen, out, outLen);
   if (!!err) {
     printf("%-26s %s\n", argv[0], soxr_strerror(err));
