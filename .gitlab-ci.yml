@@ -1,0 +1,89 @@
+stages: 
+  - token
+  - build
+
+generate token:
+  stage: token
+  image: ubuntu:xenial
+  script:
+    - apt update && apt install jq git curl -y
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${GITLAB_USER_LOGIN}/artifactory-tokenizer.git
+    - cd artifactory-tokenizer
+    - ./get_token.sh conan-deployers > token.json
+    - cat token.json | jq -r '.access_token' > ../access_token
+  artifacts:
+    paths:
+      - access_token
+    expire_in: 10 mins
+  except:
+    - tags # avoids duplicate builds for tags
+
+build-linux:
+  stage: build
+  image: conanio/gcc8
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install ..
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
+    - make
+  artifacts:
+    paths:
+      - build/lib/libaudresample.a
+      - build/bin/src_oneshot
+      - build/bin/src_streaming
+      
+build-linux-shared:
+  stage: build
+  image: conanio/gcc8
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install ..
+    - cmake .. -DBUILD_SHARED_LIB=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
+    - make
+  artifacts:
+    paths:
+      - build/lib/libaudresample.so
+      - build/bin/src_oneshot
+      - build/bin/src_streaming
+
+build-windows:
+  stage: build
+  tags:
+    - windows
+  variables:
+    CONAN_REVISIONS_ENABLED: 1
+  before_script:
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install .. -s compiler.runtime=MT
+    - cmake -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> .. -G "Visual Studio 16 2019" -A x64
+    - cmake --build . --config Release
+  artifacts:
+    paths:
+      - build/lib/audresample.lib
+
+build-windows-shared:
+  stage: build
+  tags:
+    - windows
+  variables:
+    CONAN_REVISIONS_ENABLED: 1
+  before_script:
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install .. -s compiler.runtime=MT
+    - cmake -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> .. -DBUILD_SHARED_LIB=ON -G "Visual Studio 16 2019" -A x64
+    - cmake --build . --config Release
+  artifacts:
+    paths:
+      - build/bin/audresample.dll

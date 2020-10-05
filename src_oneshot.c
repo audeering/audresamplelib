@@ -5,6 +5,8 @@
 
 #include "src.h"
 
+#define STRBUFFERLEN 1024
+
 
 int main(int argc, char **argv)
 {
@@ -12,11 +14,10 @@ int main(int argc, char **argv)
   double srOut = atof(argv[2]);
 
   // Prepare output file name
-  const int strBufferLen = 1024;
-  char outFile[strBufferLen];
-  int outFileLen = snprintf(outFile, strBufferLen,
+  char outFile[STRBUFFERLEN];
+  int outFileLen = snprintf(outFile, STRBUFFERLEN,
                             "%s_sr%sHz.wav", argv[1], argv[2]);
-  if (outFileLen > strBufferLen) {
+  if (outFileLen > STRBUFFERLEN) {
     printf("Input file name is too long!\n");
     return 1;
   }
@@ -48,12 +49,12 @@ int main(int argc, char **argv)
 
   // Pipe the audio data to ffmpeg, which writes it the output file
   FILE *pipeout;
-  char ffmpegCommand[strBufferLen];
+  char ffmpegCommand[STRBUFFERLEN];
   int commandLen = snprintf(
-      ffmpegCommand, strBufferLen,
+      ffmpegCommand, STRBUFFERLEN,
       "ffmpeg -y -f s16le -ar %s -ac 1 -i - %s", argv[2], outFile
   );
-  if (commandLen > strBufferLen) {
+  if (commandLen > STRBUFFERLEN) {
     printf("Input file name is too long!\n");
     return 1;
   }
