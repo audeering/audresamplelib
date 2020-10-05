@@ -5,22 +5,27 @@ Rate Conversion (SRC).
 
 
 ## Build
-First, download, build and install `soxr` ([code](https://sourceforge.net/p/soxr/code/ci/master/tree/)).
+The build process is based on Conan (for dependency management) and uses CMake
+as build system. For the Conan part, it is suggested to set up and activate a 
+Python virtual environment:
 
-In addition, clone, build and install the `audeering-libs` as a static library.
-See [audering-libs](https://gitlab.audeering.com/tools/audeering-libs) 
-(specifically, the section 
-[Building and installing to a custom path](https://gitlab.audeering.com/tools/audeering-libs#building-and-installing-to-a-custom-path)).
+```bash
+virtualenv --python=python3 venv
+source venv/bin/activate
+```
+
+Once the virtual environment is activated, install the `conan` package:
+
+```bash
+pip install conan
+```
 
 Then,
 ```bash
 mkdir Release
 cd Release
-cmake \
-    -DAUDEERING_LIBS_PATH=</path/to/audeering-libs> \
-    -Daudeering_DIR=</path/to/audeering-libs>/lib/cmake/audeering \
-    .. \
-    -DCMAKE_BUILD_TYPE=Release
+conan install ..
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
 make
 ```
 This will build both the wrapper library around `soxr` and two sample tools 

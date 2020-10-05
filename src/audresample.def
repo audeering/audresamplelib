@@ -1,0 +1,10 @@
+LIBRARY audresample
+EXPORTS
+   init_converter_config
+   get_output_length
+   get_output_length_from_buffer_length
+   audresample_oneshot
+   audresample_create
+   audresample_delete
+   audresample_process
+   
