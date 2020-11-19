@@ -63,26 +63,15 @@ target_link_libraries(audresample PRIVATE ${soxr})
 #### EXTRA TOOLS ######
 
 if(BUILD_TOOLS)
-
-	find_package(audeering REQUIRED)
 	
 	## oneshot converter ##
 	add_executable(src_oneshot src_oneshot.c)
-	target_include_directories(src_oneshot 
-		PRIVATE
-			"${CMAKE_CURRENT_SOURCE_DIR}/include"
-	)
-	
-	target_link_libraries(src_oneshot PRIVATE audeering)
-	target_link_libraries(src_oneshot PRIVATE audresample)
+	target_include_directories(src_oneshot PRIVATE include)
+	target_link_libraries(src_oneshot PRIVATE audresample ${CONAN_LIBS})
 	
 	## streaming converter ##
 	add_executable(src_streaming src_streaming.c)
+	target_include_directories(src_streaming PRIVATE include)
+	target_link_libraries(src_streaming PRIVATE audresample ${CONAN_LIBS})
 	
-	target_include_directories(src_streaming
-		PRIVATE
-			"${CMAKE_CURRENT_SOURCE_DIR}/include"
-	)
-	target_link_libraries(src_streaming PRIVATE audeering)
-	target_link_libraries(src_streaming PRIVATE audresample)
 endif()
