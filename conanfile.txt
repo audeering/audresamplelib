@@ -1,6 +1,6 @@
 [requires]
 soxr/0.1.3@audeering/testing
-audeering-libs/0.2.2@audeering/testing
+dr_wav/0.12.12@audeering/testing
 
 [generators]
 cmake

@@ -1,6 +1,6 @@
 #include <soxr.h>
-#include <audeering/commonlib-audeering.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 typedef struct {
@@ -58,8 +58,8 @@ soxr_io_spec_t to_sox_type(size_t dataSize);
  * configuration object). */
 soxr_error_t audresample_oneshot(
     t_converter_config converterConfig,
-    const FLOAT_TYPE *in, size_t inLength,
-    FLOAT_TYPE *out, size_t outLength
+    const float *in, size_t inLength,
+    float *out, size_t outLength
 );
 
 
@@ -79,11 +79,11 @@ void audresample_delete(soxr_t resampler);
  * End-of-input (i.e. no data is available nor shall be available) may be
  * indicated by setting `in' to NULL. */
 soxr_error_t audresample_process(
-    soxr_t      resampler,      /* As returned by soxr_create. */
-    const soxr_in_t   in,       /* Input buffer, may be NULL (see above). */
-    size_t      ilen,           /* Input buf. length (samples per channel). */
-    size_t      * idone,        /* To return actual # samples used (<= ilen). */
-    soxr_out_t  out,            /* Output buffer.*/
-    size_t      olen,           /* Output buf. length (samples per channel). */
-    size_t      * odone         /* To return actual # samples out (<= olen). */
+    soxr_t resampler,      /* As returned by soxr_create. */
+    const soxr_in_t in,    /* Input buffer, may be NULL (see above). */
+    size_t ilen,           /* Input buf. length (samples per channel). */
+    size_t *idone,         /* To return actual # samples used (<= ilen). */
+    soxr_out_t out,        /* Output buffer.*/
+    size_t olen,           /* Output buf. length (samples per channel). */
+    size_t *odone          /* To return actual # samples out (<= olen). */
 );

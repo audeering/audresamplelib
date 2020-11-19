@@ -23,18 +23,25 @@ int main(int argc, char **argv)
   }
 
   // Read input file
-  t_wave_obj *waveObj = init_wave(inFile);
-  int SR = (int) waveObj->header.sampleRate;
-  long nSamples = waveObj->nSamples;
-  FLOAT_TYPE *input = (FLOAT_TYPE*) malloc(nSamples * sizeof(FLOAT_TYPE));
-  read_wave(waveObj, input, 1, nSamples, 1);
-  free_wave(waveObj);
+  unsigned int channels;
+  unsigned int SR;
+  drwav_uint64 inLen;
+  float* input = drwav_open_file_and_read_pcm_frames_f32(inFile, &channels, &SR,
+                                                         &inLen, NULL);
+  if (input == NULL) {
+    printf("Error while opening and reading WAV file!\n");
+    return 1;
+  }
+  if (channels != 1) {
+    printf("Error: only mono signals are currently supported!\n");
+    return 1;
+  }
 
   // Configure and perform the sample rate conversion
   double const irate = (double) SR;
   t_converter_config converterConfig = init_converter_config(irate, orate, 'h');
-  const long nSamples_out = get_output_length(nSamples, converterConfig);
-  FLOAT_TYPE *output = (FLOAT_TYPE*) calloc(nSamples_out, sizeof(FLOAT_TYPE));
+  const long outLen = get_output_length(inLen, converterConfig);
+  float *output = (float*) calloc(outLen, sizeof(float));
 
   /* Allocate resampling input and output buffers in proportion to the input
    * and output rates: */
@@ -60,7 +67,7 @@ int main(int argc, char **argv)
       if (need_input) {
 
         /* Read one block into the buffer, ready to be resampled: */
-        if (nRead + ilen < nSamples) {
+        if (nRead + ilen < inLen) {
           memcpy(ibuf, input + nRead, ilen * isize);
           nRead += ilen;
           ilen1 = ilen;
@@ -98,7 +105,9 @@ int main(int argc, char **argv)
   }
                                                                   /* Tidy up: */
   audresample_delete(resampler);
-  free(input), free(obuf), free(ibuf);
+  drwav_free(input, NULL);
+  free(obuf);
+  free(ibuf);
                                                               /* Diagnostics: */
   if (!!err) {
     fprintf(stderr, "%-26s %s; I/O: %s\n", argv[0], soxr_strerror(err),
@@ -107,30 +116,30 @@ int main(int argc, char **argv)
   }
 
   // Convert from float to integer PCM samples
-  long number_bytes_out = 2 * nSamples_out;
-  short signed int *output_pcm =
-      (short signed int*) calloc(nSamples_out, sizeof(short signed int));
-  for (int i = 0; i < nSamples_out; ++i){
-    output_pcm[i] = (short signed int) (FSR/2) * clipSample(output[i]);
+  short signed int *outputPCM =
+      (short signed int*) calloc(outLen, sizeof(short signed int));
+  for (int i = 0; i < outLen; ++i){
+    outputPCM[i] = (short signed int) (FSR/2) * clipSample(output[i]);
   }
   free(output);
 
-  // Pipe the audio data to ffmpeg, which writes it the output file
-  FILE *pipeout;
-  char ffmpegCommand[STRBUFFERLEN];
-  int commandLen = snprintf(
-      ffmpegCommand, STRBUFFERLEN,
-      "ffmpeg -y -f s16le -ar %s -ac 1 -i - %s", argv[2], outFile
-  );
-  if (commandLen > STRBUFFERLEN) {
-    printf("Input file name is too long!\n");
+  // Write resampled signal to WAV
+  drwav wavOut;
+  drwav_data_format format;
+  format.container = drwav_container_riff;  // normal WAV files
+  format.format = DR_WAVE_FORMAT_PCM;
+  format.channels = 1;
+  format.sampleRate = (unsigned int) orate;
+  format.bitsPerSample = 16;
+  drwav_init_file_write(&wavOut, outFile, &format, NULL);
+  drwav_uint64 framesWritten = drwav_write_pcm_frames(&wavOut, outLen,
+                                                      outputPCM);
+  if (framesWritten != outLen) {
+    printf("Error: something went wrong while writing the output wav file!\n");
     return 1;
   }
-  pipeout = popen(ffmpegCommand, "w");
-  fwrite(output_pcm, 2, nSamples_out, pipeout);
-  pclose(pipeout);
-
-  free(output_pcm);
+  drwav_uninit(&wavOut);
+  free(outputPCM);
 
   return 0;
 }
