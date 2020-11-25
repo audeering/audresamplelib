@@ -23,6 +23,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # List of source files: libaudresample_SOURCES
 set(libaudresample_SOURCES
     src/audresample.c
+    src/remix.c
     src/audresample.def
 )
 
@@ -58,6 +59,14 @@ target_include_directories(audresample
 
 find_library(soxr soxr)
 target_link_libraries(audresample PRIVATE ${soxr})
+
+
+#### TESTS ######
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)    
+endif()
 
 
 #### EXTRA TOOLS ######

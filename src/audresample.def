@@ -8,3 +8,6 @@ EXPORTS
    audresample_delete
    audresample_process
    
+   do_mono_mixdown
+   do_mono_mixdown_inplace
+   

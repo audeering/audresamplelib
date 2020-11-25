@@ -25,22 +25,23 @@ int main(int argc, char **argv)
   // Read input file
   unsigned int channels;
   unsigned int SR;
-  drwav_uint64 inLen;
-  float* input = drwav_open_file_and_read_pcm_frames_f32(inFile, &channels, &SR,
-                                                         &inLen, NULL);
+  drwav_uint64 totalFrameCount;
+  float* input = drwav_open_file_and_read_pcm_frames_f32(
+      inFile, &channels, &SR, &totalFrameCount, NULL
+  );
   if (input == NULL) {
     printf("Error while opening and reading WAV file!\n");
     return 1;
   }
   if (channels != 1) {
-    printf("Error: only mono signals are currently supported!\n");
-    return 1;
+    do_mono_mixdown_inplace(input, totalFrameCount, channels);
   }
+  size_t inLen = totalFrameCount;
 
   // Configure and perform the sample rate conversion
   double const irate = (double) SR;
   t_converter_config converterConfig = init_converter_config(irate, orate, 'h');
-  const long outLen = get_output_length(inLen, converterConfig);
+  size_t outLen = get_output_length(inLen, converterConfig);
   float *output = (float*) calloc(outLen, sizeof(float));
 
   /* Allocate resampling input and output buffers in proportion to the input

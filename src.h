@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <math.h>
 #include <audresample.h>
+#include <remix.h>
 
 
 #undef M_PI /* Sometimes missing, so ensure that it is defined: */
