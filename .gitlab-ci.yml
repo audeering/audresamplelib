@@ -1,8 +1,9 @@
 stages: 
   - token
   - build
+  - test
 
-generate token:
+generate-token:
   stage: token
   image: ubuntu:xenial
   script:
@@ -14,7 +15,7 @@ generate token:
   artifacts:
     paths:
       - access_token
-    expire_in: 10 mins
+    expire_in: 20 mins
   except:
     - tags # avoids duplicate builds for tags
 
@@ -28,13 +29,14 @@ build-linux:
   script:
     - mkdir build; cd build
     - conan install ..
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON -DBUILD_TESTS=ON
     - make
   artifacts:
     paths:
       - build/lib/libaudresample.a
       - build/bin/src_oneshot
       - build/bin/src_streaming
+      - build/bin/audresample-test
       
 build-linux-shared:
   stage: build
@@ -96,3 +98,21 @@ build-windows-shared:
       - build/bin/audresample.dll
   after_script:
     - rm -r -fo C:/ci-jobs/${CI_JOB_ID} # Cleanup workspace
+
+
+linux-test:
+  stage: test
+  image: conanio/gcc8
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+    - cd build
+    - conan install ..
+    - cd ..
+  script:
+    - build/bin/audresample-test
+  dependencies:
+    - build-linux
+    - generate-token
+
