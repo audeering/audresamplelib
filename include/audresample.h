@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+/** Definition of a converter configuration. */
 typedef struct {
-  double srIn;
-  double srOut;
-  char quality;
+  double srIn;   // in Hz
+  double srOut;  // in Hz
+  char quality;  // options: q, l, m, h, v
 } t_converter_config;
 
 
