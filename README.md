@@ -5,9 +5,8 @@ Rate Conversion (SRC).
 
 
 ## Build
-The build process is based on Conan (for dependency management) and uses CMake
-as build system. For the Conan part, it is suggested to set up and activate a 
-Python virtual environment:
+The library is intended to be built via CMake, using Conan as a dependency manager. 
+For the Conan part, it is suggested to set up and activate a Python virtual environment:
 
 ```bash
 virtualenv --python=python3 venv
