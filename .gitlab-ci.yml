@@ -77,7 +77,6 @@ build-windows:
   after_script:
     - rm -r -fo C:/ci-jobs/${CI_JOB_ID} # Cleanup workspace
 
-
 build-windows-shared:
   stage: build
   tags:
@@ -99,6 +98,44 @@ build-windows-shared:
   after_script:
     - rm -r -fo C:/ci-jobs/${CI_JOB_ID} # Cleanup workspace
 
+build-macos:
+  stage: build
+  tags:
+    - osx
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan || true
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install ..
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON -DBUILD_TESTS=ON
+    - make
+  artifacts:
+    paths:
+      - build/lib/libaudresample.a
+      - build/bin/src_oneshot
+      - build/bin/src_streaming
+      - build/bin/audresample-test
+      
+build-macos-shared:
+  stage: build
+  tags:
+    - osx
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan || true
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+  script:
+    - mkdir build; cd build
+    - conan install ..
+    - cmake .. -DBUILD_SHARED_LIB=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
+    - make
+  artifacts:
+    paths:
+      - build/lib/libaudresample.dylib
+      - build/bin/src_oneshot
+      - build/bin/src_streaming
 
 linux-test:
   stage: test
@@ -116,3 +153,19 @@ linux-test:
     - build-linux
     - generate-token
 
+macos-test:
+  stage: test
+  tags:
+    - osx
+  before_script:
+    - conan remote add conan-local https://artifactory.audeering.com/artifactory/api/conan/conan || true
+    - conan config set general.revisions_enabled=True
+    - conan user -p $(cat access_token) -r conan-local ${GITLAB_USER_LOGIN}
+    - cd build
+    - conan install ..
+    - cd ..
+  script:
+    - build/bin/audresample-test
+  dependencies:
+    - build-macos
+    - generate-token
