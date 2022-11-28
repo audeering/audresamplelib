@@ -23,11 +23,11 @@ TEST_CASE("End-to-end generic test", "[end-to-end]") {
   if (srIn == srOut) return;
   unsigned int nChannelsIn = GENERATE(1, 2);
 
-  std::string wavPathIn = std::string("tests/test-assets/original-") +
+  std::string wavPathIn = std::string("test-assets/original-") +
       signalTypeMap[signalTypeCode] + "__" +
       "sr_" + std::to_string(srIn) + "__" +
       "channels_" + std::to_string(nChannelsIn) + ".wav";
-  std::string wavPathTarget = std::string("tests/test-assets/resampled-") +
+  std::string wavPathTarget = std::string("test-assets/resampled-") +
       signalTypeMap[signalTypeCode] + "__" +
       "sr-in_" + std::to_string(srIn) + "__" +
       "sr-out_" + std::to_string(srOut) + "__" +

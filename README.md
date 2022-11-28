@@ -21,8 +21,8 @@ pip install conan
 
 Then,
 ```bash
-mkdir Release
-cd Release
+mkdir build
+cd build
 conan install ..
 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=ON
 make
