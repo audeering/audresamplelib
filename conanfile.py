@@ -4,7 +4,7 @@ from conans import ConanFile, CMake, tools
 class AudresampleLibConan(ConanFile):
     name = "audresamplelib"
     version = "latest"
-    license = "Proprietary"
+    license = "MIT"
     url = "https://github.com/audeering/audresamplelib"
     description = "A C-wrapper around soxr for Sample Rate Conversion (SRC)"
 
