@@ -1,1 +1,4 @@
+# Ensure line endings are the same on all systems to prevent "outdated" error while uploading recipe
+* text=auto eol=lf
+# Store all WAV files in git LFS
 *.wav filter=lfs diff=lfs merge=lfs -text
