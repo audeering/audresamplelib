@@ -1,4 +1,5 @@
-from conans import ConanFile, CMake, tools
+from conan import ConanFile
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 
 
 class AudresampleLibConan(ConanFile):
@@ -7,39 +8,53 @@ class AudresampleLibConan(ConanFile):
     license = "MIT"
     url = "https://github.com/audeering/audresamplelib"
     description = "A C-wrapper around soxr for Sample Rate Conversion (SRC)"
+    topics = ("resample", "soxr")
+    generators = "CMakeDeps"
 
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False], "fPIC": [True, False], "build_tools": [True, False]}
-    default_options = {"shared": False, "fPIC": True, "build_tools": False}
+    options = {
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "build_tools": [True, False],
+    }
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "build_tools": False,
+    }
 
-    generators = "cmake"
-    exports_sources = "src/*", "include/*", "progsrc/*", "tests/*", "CMakeLists.txt"
+    exports_sources = "src/*", "include/*", "progsrc/*", "tests/*", "CMakeLists.txt", "LICENSE"
 
-    def requirements(self):
-        self.requires("soxr/0.1.3")
-        self.requires("drwav/0.13.7")
+    def config_options(self):
+        if self.settings.os == "Windows":
+            self.options.rm_safe("fPIC")
 
     def configure(self):
-        del self.settings.compiler.libcxx
-        del self.settings.compiler.cppstd
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
+        self.settings.rm_safe("compiler.cppstd")
+        self.settings.rm_safe("compiler.libcxx")
 
-        if self.settings.compiler == "Visual Studio":
-            del self.options.fPIC
+    def requirements(self):
+        self.requires("soxr/0.1.3", transitive_headers=True)
+        self.requires("drwav/0.13.7", transitive_headers=True)
+
+    def layout(self):
+        cmake_layout(self, src_folder=".")
+
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.variables["BUILD_TOOLS"] = self.options.build_tools
+        tc.generate()
 
     def build(self):
-        self.cmake = CMake(self)
-        self.cmake.definitions["BUILD_TOOLS"] = self.options.build_tools
-        self.cmake.configure()
-        self.cmake.build()
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def package(self):
-        self.copy("*", dst="bin", src="bin")
-        self.copy("*.h", dst="include", src="include")
-        self.copy("*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.dylib*", dst="lib", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        cmake = CMake(self)
+        cmake.install()
 
     def package_info(self):
         self.cpp_info.libs = ["audresample"]

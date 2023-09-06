@@ -1,25 +1,26 @@
-from conans import ConanFile, CMake, tools
+from conan import ConanFile
+from conan.tools.build import can_run
+from conan.tools.cmake import CMake, cmake_layout
 
 
 class AudresampleLibTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
-    requires = "catch2/2.13.7"
+    generators = "CMakeDeps", "CMakeToolchain", "VirtualRunEnv"
 
-    def configure(self):
-        tools.check_min_cppstd(self, "11")
+    def build_requirements(self):
+        self.test_requires("catch2/3.1.0")
+
+    def requirements(self):
+        self.requires(self.tested_reference_str)
+
+    def layout(self):
+        cmake_layout(self)
 
     def build(self):
         self.cmake = CMake(self)
         self.cmake.configure()
         self.cmake.build()
 
-    def imports(self):
-        # using @bindirs and @libdirs placeholders to also support dependencies in editable mode (see https://docs.conan.io/en/latest/reference/conanfile/methods.html#imports)
-        self.copy("*.dll", dst="bin", src="@bindirs")
-        self.copy("*.dylib*", dst="bin", src="@libdirs")
-        self.copy("*.so*", dst="bin", src="@libdirs")
-
     def test(self):
-        if not tools.cross_building(self):
-            self.cmake.test(output_on_failure=True)
+        if can_run(self):
+            self.run(f"ctest . -C {self.settings.build_type} --output-on-failure", env="conanrun")

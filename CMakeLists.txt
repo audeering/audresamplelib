@@ -8,11 +8,7 @@ project(audresample)
 
 option(BUILD_TOOLS "Build utilities in the progsrc folder." OFF)
 
-# setup conan
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(KEEP_RPATHS)
-endif()
+find_package(soxr REQUIRED)
 
 # set C standard to version 99 for all targets
 set(CMAKE_C_STANDARD 99)
@@ -37,19 +33,46 @@ if(WIN32)
     )
 endif()
 
-target_include_directories(audresample PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(audresample PRIVATE include)
 
-target_link_libraries(audresample PRIVATE ${CONAN_LIBS})
+target_link_libraries(audresample PRIVATE soxr::soxr)
+
+install(DIRECTORY include/ DESTINATION include
+    FILES_MATCHING
+        PATTERN "*.h"
+)
+install(TARGETS audresample
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(FILES LICENSE DESTINATION licenses)
 
 # ### EXTRA TOOLS ######
 if(BUILD_TOOLS)
+    find_package(drwav REQUIRED)
+
     # # oneshot converter ##
     add_executable(src_oneshot progsrc/src_oneshot.c)
-    target_include_directories(src_oneshot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(src_oneshot PRIVATE audresample)
+    target_include_directories(src_oneshot PRIVATE include)
+    target_link_libraries(src_oneshot 
+        PRIVATE
+            audresample
+            drwav::drwav
+            soxr::soxr
+    )
 
     # # streaming converter ##
     add_executable(src_streaming progsrc/src_streaming.c)
-    target_include_directories(src_streaming PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(src_streaming PRIVATE audresample)
+    target_include_directories(src_streaming PRIVATE include)
+    target_link_libraries(src_streaming 
+        PRIVATE
+            audresample
+            drwav::drwav
+            soxr::soxr
+    )
+
+    install(TARGETS src_oneshot src_streaming
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 endif()

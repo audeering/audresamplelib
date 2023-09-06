@@ -1,4 +1,4 @@
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "dr_wav.h"
 extern "C" {
   #include "audresample.h"
